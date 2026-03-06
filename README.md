@@ -48,6 +48,7 @@ Results are sorted by company within each site so you can see everything a given
 | `job-scraper.ts` | The main script — run via the launch script, or directly with `npx tsx job-scraper.ts` |
 | `job-scraper-launch.ps1` | Windows launcher — handles setup and starts the tool |
 | `job-scraper-launch.sh` | Mac / Linux launcher — handles setup and starts the tool |
+| `refine-results.py` | Optional second pass — aggregates multiple search results, ranks by relevance, and filters noise |
 
 ## Requirements
 
@@ -123,9 +124,31 @@ Run the appropriate launch script for your OS (see Getting Started above). You w
 | File | Description |
 | --- | --- |
 | `results-{keyword}.html` | Browsable HTML report for this search term. Open in any browser. |
+| `results-aggregated.html` | Combined report produced by `refine-results.py`. |
 | `seen-{keyword}.json` | Persistent record of all job IDs seen for this keyword across previous runs. Delete this file to reset tracking for that keyword. |
 | `indeed-browser-context.json` | Saved Indeed browser state for returning-user simulation. Generated automatically on first run. |
 | `job-scraper-config.json` | Stores your last used cookie file paths for Indeed and TotalJobs. Generated automatically. |
+
+## Refining results across multiple searches
+
+After running job-scraper with two or more different keyword searches, you can use `refine-results.py` to aggregate and rank the combined results.
+
+```bash
+python refine-results.py
+```
+
+Run it from the same folder as your results files. It will auto-detect all `results-*.html` files and ask you to confirm before proceeding. You can also pass specific files as arguments:
+
+```bash
+python refine-results.py results-all-soc-analyst.html results-all-cyber-security-analyst.html
+```
+
+It produces a single `results-aggregated.html` report with jobs ranked by how many of your searches they appeared in. Jobs appearing in all searches are surfaced at the top. It also automatically separates out:
+
+- **Likely irrelevant** — titles whose words appear rarely across the result set, flagging outliers like physical security engineering roles that slip through keyword matching
+- **High volume recruiters** — companies posting 6 or more listings, separated for review as they may be aggregators rather than direct hirers
+
+Requires Python 3 — no additional packages needed.
 
 ## Disclaimer
 
