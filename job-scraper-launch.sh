@@ -82,7 +82,7 @@ echo "  OK  Node.js $NODE_VERSION_RAW detected"
 if [ ! -d "node_modules" ]; then
     echo "  Installing dependencies..."
     echo ""
-    npm install playwright-extra puppeteer-extra-plugin-stealth tsx typescript @types/node
+    npm install playwright playwright-extra puppeteer-extra-plugin-stealth tsx typescript @types/node
     if [ $? -ne 0 ]; then
         echo ""
         echo "  FAILED: npm install failed. Please check the output above."
@@ -121,5 +121,3 @@ echo "  -------------------------------------"
 echo ""
 
 npx tsx job-scraper.ts
-
-
