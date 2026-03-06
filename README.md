@@ -145,7 +145,7 @@ python refine-results.py results-all-systems-analyst.html results-all-systems-en
 
 It produces a single `results-aggregated.html` report with jobs ranked by how many of your searches they appeared in. Jobs appearing in all searches are surfaced at the top. It also automatically separates out:
 
-- **Likely irrelevant** — titles whose words appear rarely across the result set, flagging outliers like physical security engineering roles that slip through keyword matching
+- **Likely irrelevant** — titles whose words appear rarely across the result set, flagging outliers that slipped through keyword matching
 - **High volume recruiters** — companies posting 6 or more listings, separated for review as they may be aggregators rather than direct hirers
 
 Requires Python 3 — no additional packages needed.
