@@ -2,6 +2,14 @@
 
 A Playwright-based automation script that searches the UK job sites Reed, Indeed, and TotalJobs, filters results by job title keywords, and generates a browsable HTML report with duplicate and spam detection.
 
+## What's included
+
+| File | Purpose |
+| --- | --- |
+| `job-scraper.ts` | The main script — do not run this directly |
+| `job-scraper-launch.ps1` | Windows launcher — run this to start the tool |
+| `job-scraper-launch.sh` | Mac / Linux launcher — run this to start the tool |
+
 ## Overview
 
 job-scraper automates job searching across Reed, Indeed, and TotalJobs, combining results into a single clean HTML report. Enter your parameters once and the script does the rest.
@@ -64,7 +72,7 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 Then to launch the script:
 
 ```powershell
-.\job-scraper.ps1
+.\job-scraper-launch.ps1
 ```
 
 ### Mac / Linux
@@ -72,13 +80,13 @@ Then to launch the script:
 Make the script executable once after cloning:
 
 ```bash
-chmod +x job-scraper.sh
+chmod +x job-scraper-launch.sh
 ```
 
 Then to launch the script:
 
 ```bash
-./job-scraper.sh
+./job-scraper-launch.sh
 ```
 
 The launch script will check for Node.js, install dependencies, and install the Playwright browser if needed before starting the tool. On subsequent runs it skips straight to launching.
