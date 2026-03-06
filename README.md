@@ -2,7 +2,7 @@
 
 A Playwright-based automation script that searches the UK job sites Reed, Indeed, and TotalJobs, filters results by job title keywords, and generates a browsable HTML report with duplicate and spam detection.
 
-<img width="600" height="370" alt="image" src="https://github.com/user-attachments/assets/b1ef5901-c3b2-4d79-8be8-5b3c35c4ea74" />
+<img width="560" height="345" alt="image" src="https://github.com/user-attachments/assets/b1ef5901-c3b2-4d79-8be8-5b3c35c4ea74" />
 
 ## Overview
 
