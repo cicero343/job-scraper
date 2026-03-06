@@ -108,8 +108,8 @@ Run the appropriate launch script for your OS (see Getting Started above). You w
 | --- | --- |
 | Site selection | `1` Reed (default), `2` Indeed, `3` TotalJobs, `4` All sites |
 | Cookie file path | Path to your session cookie JSON, or press Enter to skip (Indeed/TotalJobs only) |
-| Job title keywords | Free text, max 50 characters (e.g. `cyber security analyst`) |
-| Location | Town name or postcode (e.g. `London` or `SE9 1AD`) |
+| Job title keywords | Free text, max 50 characters (e.g. `teacher`) |
+| Location | Town name or postcode (e.g. `London` or `SE10 9RB`) |
 | Radius | `5`, `10`, `20`, or `30` miles |
 | Minimum salary | `30000`, `40000`, or `any` |
 | Date posted | `1`, `3`, `7`, `14` days, or `any` |
