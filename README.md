@@ -1,6 +1,6 @@
 # job-scraper
 
-A Playwright-based automation script that searches Reed, Indeed, and TotalJobs, filters results by job title keywords, and generates a browsable HTML report with duplicate and spam detection.
+A Playwright-based automation script that searches the UK job sites Reed, Indeed, and TotalJobs, filters results by job title keywords, and generates a browsable HTML report with duplicate and spam detection.
 
 ## Overview
 
