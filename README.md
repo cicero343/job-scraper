@@ -140,7 +140,7 @@ python refine-results.py
 Run it from the same folder as your results files. It will auto-detect all `results-*.html` files and ask you to confirm before proceeding. You can also pass specific files as arguments:
 
 ```bash
-python refine-results.py results-all-soc-analyst.html results-all-cyber-security-analyst.html
+python refine-results.py results-all-systems-analyst.html results-all-systems-engineer.html
 ```
 
 It produces a single `results-aggregated.html` report with jobs ranked by how many of your searches they appeared in. Jobs appearing in all searches are surfaced at the top. It also automatically separates out:
