@@ -12,17 +12,18 @@ chromium.use(StealthPlugin());
 
 function printBanner() {
   console.log(`
-   _       _                                     _
-  (_)     | |                                   | |
-   _  ___ | |__     ___  ___ _ __ __ _ _ __   ___ _ __
-  | |/ _ \\| '_ \\   / __|/ __| '__/ _\` | '_ \\ / _ \\ '__|
-  | | (_) | |_) |  \\__ \\ (__| | | (_| | |_) |  __/ |
-  | |\\___/|_.__/   |___/\\___|_|  \\__,_| .__/ \\___|_|
- _/ |                                  | |
-|__/                                   |_|
+                                                             
+           ▄▄                                                
+  ▀▀       ██                                                
+  ██ ▄███▄ ████▄   ▄█▀▀▀ ▄████ ████▄  ▀▀█▄ ████▄ ▄█▀█▄ ████▄ 
+ ▀██ ██ ██ ██ ██   ▀███▄ ██    ██ ▀▀ ▄█▀██ ██ ██ ██▄█▀ ██ ▀▀ 
+  ██ ▀███▀ ████▀   ▄▄▄█▀ ▀████ ██    ▀█▄██ ████▀ ▀█▄▄▄ ██    
+  ██                                       ██                
+▀▀▀                                        ▀▀
 
   ⚠  This tool is for educational purposes only.
   ⚠  It demonstrates browser automation and scraping techniques.
+  ⚠  Designed and tested for UK job sites only.
   ⚠  Some sites may return limited or no results without authentication.
   ⚠  A valid session cookie file (.json) may be required for certain sites.
   ⚠  Please respect the terms of service of any site you interact with.
@@ -1083,9 +1084,9 @@ function generateReport(
 // RESULTS FILENAME
 // ─────────────────────────────────────────────
 
-function resultsFile(keyword: string): string {
+function resultsFile(keyword: string, siteLabel: string): string {
   const slug = keyword.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  return `results-${slug}.html`;
+  return `results-${siteLabel}-${slug}.html`;
 }
 
 // ─────────────────────────────────────────────
@@ -1208,7 +1209,11 @@ function resultsFile(keyword: string): string {
     siteResults.forEach(r => r.jobs.forEach(j => newSeenJobs.add(j.id)));
     saveSeenJobs(params.keyword, newSeenJobs);
 
-    const outFile = resultsFile(params.keyword);
+    const siteLabel = siteChoice === '1' ? 'reed'
+      : siteChoice === '2' ? 'indeed'
+      : siteChoice === '3' ? 'totaljobs'
+      : 'all';
+    const outFile = resultsFile(params.keyword, siteLabel);
     fs.writeFileSync(outFile, html);
 
     const totalJobs = siteResults.reduce((acc, r) => acc + r.jobs.length, 0);
