@@ -2,6 +2,8 @@
 
 A Playwright-based automation script that searches the UK job sites Reed, Indeed, and TotalJobs, filters results by job title keywords, and generates a browsable HTML report with duplicate and spam detection.
 
+<img width="690" height="425" alt="image" src="https://github.com/user-attachments/assets/b1ef5901-c3b2-4d79-8be8-5b3c35c4ea74" />
+
 ## Overview
 
 job-scraper automates job searching across Reed, Indeed, and TotalJobs, combining results into a single clean HTML report. Enter your parameters once and the script does the rest.
