@@ -68,7 +68,7 @@ Write-Host "  OK  Node.js $nodeVersion detected" -ForegroundColor Green
 if (-not (Test-Path "node_modules")) {
     Write-Host "  Installing dependencies..." -ForegroundColor Yellow
     Write-Host ""
-    npm install playwright-extra puppeteer-extra-plugin-stealth tsx typescript @types/node
+    npm install playwright playwright-extra puppeteer-extra-plugin-stealth tsx typescript @types/node
     if ($LASTEXITCODE -ne 0) {
         Write-Host ""
         Write-Host "  FAILED: npm install failed. Please check the output above." -ForegroundColor Red
