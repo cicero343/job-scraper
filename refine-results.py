@@ -118,28 +118,45 @@ def aggregate_jobs(all_jobs_by_keyword):
     Aggregate jobs across keyword searches.
     Key = normalised title + company.
     Score = number of distinct keyword searches the job appeared in.
+
+    Within each keyword, we deduplicate by title+company+site so all site
+    appearances are preserved, but we only count one appearance per keyword
+    search towards search_count (regardless of how many sites it appeared on).
     """
-    # job_key -> list of appearances (one per keyword search)
+    # job_key -> list of appearances (one per keyword+site combination)
     job_map = defaultdict(list)
+    # job_key -> set of keywords already counted (for search_count)
+    job_keyword_seen = defaultdict(set)
 
     for keyword, jobs in all_jobs_by_keyword.items():
-        seen_keys_this_keyword = set()
+        seen_keys_this_keyword = set()  # title+company+site — prevents exact dupes
         for job in jobs:
-            key = f"{job['title'].lower().strip()}||{job['company'].lower().strip()}"
-            if key not in seen_keys_this_keyword:
-                job_map[key].append(job)
-                seen_keys_this_keyword.add(key)
+            merge_key = f"{job['title'].lower().strip()}||{job['company'].lower().strip()}"
+            site_key = f"{merge_key}||{job['site'].lower()}"
+            if site_key not in seen_keys_this_keyword:
+                job_map[merge_key].append(job)
+                seen_keys_this_keyword.add(site_key)
+                job_keyword_seen[merge_key].add(keyword)
 
     aggregated = []
     for key, appearances in job_map.items():
-        # Use the first appearance as the canonical entry
         canonical = appearances[0].copy()
-        canonical['search_count'] = len(appearances)
-        canonical['keywords_found_in'] = [a['keyword'] for a in appearances]
-        # Preserve easy_apply if any appearance has it
+        # search_count = distinct keywords this job appeared in (not site count)
+        canonical['search_count'] = len(job_keyword_seen[key])
+        canonical['keywords_found_in'] = sorted(job_keyword_seen[key])
         canonical['easy_apply'] = any(a['easy_apply'] for a in appearances)
-        # Preserve seen_before if any appearance has it
         canonical['seen_before'] = any(a['seen_before'] for a in appearances)
+        # Collect all unique site appearances with their URLs (deduplicated by site)
+        seen_sites = set()
+        site_links = []
+        for a in appearances:
+            if a['site'] not in seen_sites:
+                site_links.append({'site': a['site'], 'url': a['url']})
+                seen_sites.add(a['site'])
+        # Sort: Reed first (has Easy Apply), then Indeed, then TotalJobs
+        site_order = {'Reed': 0, 'Indeed': 1, 'TotalJobs': 2}
+        site_links.sort(key=lambda x: site_order.get(x['site'], 9))
+        canonical['site_links'] = site_links
         aggregated.append(canonical)
 
     # Sort: by search_count desc, then company name asc within each tier
@@ -283,14 +300,15 @@ def generate_report(aggregated, keywords, source_files, high_volume_groups=None)
         if job['seen_before']:
             badges += '<span style="background:#e67e22;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.75rem;margin-right:6px;">SEEN BEFORE</span>'
 
-        site_badge = f'<span style="color:#999;font-size:0.75rem;margin-right:6px;">[{job["site"]}]</span>'
+        # Site links — one clickable badge per site the job was found on
+        site_links = job.get('site_links', [{'site': job['site'], 'url': job['url']}])
+        site_badges = ''
+        for sl in site_links:
+            site_badges += f'<a href="{sl["url"]}" style="color:#999;font-size:0.75rem;margin-right:4px;text-decoration:none;" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">[{sl["site"]}]</a>'
 
-        if job['site'] == 'Reed':
-            title_el = f'<a href="{job["url"]}" style="font-weight:bold;color:#1a1a1a;text-decoration:none;" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">{job["title"]}</a>'
-            url_el = ''
-        else:
-            title_el = f'<strong>{job["title"]}</strong>'
-            url_el = f'<br><a href="{job["url"]}" style="font-size:0.85rem;">{job["url"]}</a>'
+        # Title — use first site link for the main clickable title
+        primary = site_links[0]
+        title_el = f'<a href="{primary["url"]}" style="font-weight:bold;color:#1a1a1a;text-decoration:none;" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">{job["title"]}</a>'
 
         keywords_found = ', '.join(job['keywords_found_in'])
         opacity = '0.5' if job['seen_before'] else '1'
@@ -298,10 +316,9 @@ def generate_report(aggregated, keywords, source_files, high_volume_groups=None)
         return f'''
         <div style="margin:14px 0;opacity:{opacity};">
           <span style="color:#999;font-size:0.85rem;margin-right:8px;">{index}.</span>
-          {search_badge}{badges}{site_badge}
+          {search_badge}{badges}{site_badges}
           {title_el}
           {f'<span style="color:#666;margin-left:8px;">— {job["company"]}</span>' if job["company"] else ''}
-          {url_el}
           <div style="color:#aaa;font-size:0.75rem;margin-top:2px;margin-left:20px;">Found in: {keywords_found}</div>
         </div>'''
 
