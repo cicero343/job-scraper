@@ -160,3 +160,16 @@ seen-*.json
 
 # Results
 results-*.html
+
+# TypeScript build output
+dist/
+*.js.map
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
