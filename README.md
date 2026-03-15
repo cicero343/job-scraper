@@ -156,4 +156,4 @@ This tool is intended for personal, educational use only. It demonstrates browse
 
 ## License
 
-MIT License — see [LICENSE](https://claude.ai/chat/LICENSE) for details.
+MIT License — see [LICENSE](https://github.com/cicero343/job-scraper/blob/main/LICENSE) for details.
