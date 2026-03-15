@@ -60,7 +60,7 @@ Results are sorted by company within each site so you can see everything a given
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/job-scraper.git
+git clone https://github.com/cicero343/job-scraper.git
 cd job-scraper
 ```
 
