@@ -99,7 +99,7 @@ The launch script will check for Node.js, install dependencies, and install the 
 
 Reed works without any authentication and is the most reliable option. Indeed and TotalJobs may return limited or no results without a valid session. Indeed in particular has aggressive bot detection — results may vary regardless of cookie status.
 
-If you have a session cookie file in JSON format for either site, you can provide the path at the prompt when selecting those sites. If you do not have one, simply press Enter to skip — the script will still run but results may be limited.
+If you have a session cookie file in JSON format for either site, save it as `data/cookies/indeed-cookies.json` or `data/cookies/totaljobs-cookies.json` (offered automatically), or provide any path at the prompt. If you do not have one, simply press Enter to skip — the script will still run but results may be limited.
 
 > **Important:** Never commit cookie files to a public repository. They contain your personal session data. The `.gitignore` in this repo excludes common cookie filenames by default.
 > 
@@ -121,13 +121,26 @@ Run the appropriate launch script for your OS (see Getting Started above). You w
 
 ## Output files
 
-| File | Description |
-| --- | --- |
-| `results-{keyword}.html` | Browsable HTML report for this search term. Open in any browser. |
-| `results-aggregated.html` | Combined report produced by `refine-results.py`. |
-| `seen-{keyword}.json` | Persistent record of all job IDs seen for this keyword across previous runs. Delete this file to reset tracking for that keyword. |
-| `indeed-browser-context.json` | Saved Indeed browser state for returning-user simulation. Generated automatically on first run. |
-| `job-scraper-config.json` | Stores your last used cookie file paths for Indeed and TotalJobs. Generated automatically. |
+Everything is kept in three folders next to the script. They are created automatically, and files from the old flat layout are moved into them on the first run.
+
+```
+job-scraper/
+├─ data/
+│  ├─ config.json                  last-used cookie file paths
+│  ├─ indeed-browser-context.json  saved Indeed session (returning-user simulation)
+│  └─ cookies/                     put indeed-cookies.json / totaljobs-cookies.json here
+├─ results/
+│  ├─ <keyword>/
+│  │  ├─ 2026-10-15_2031_all.html  one report per run (newest 30 kept)
+│  │  ├─ latest.html               copy of the newest report
+│  │  └─ seen.json                 job IDs seen for this keyword — delete to reset
+│  └─ _aggregated/                 output of refine-results.py
+└─ debug/                          screenshot + page HTML saved whenever a site fails
+```
+
+Cookie files named `indeed-cookies.json` / `totaljobs-cookies.json` in `data/cookies/` are offered automatically at the prompt.
+
+Set `HEADLESS=1` to run without a visible browser window. With the window visible (the default), if Indeed shows a Cloudflare check the script pauses for up to two minutes so you can solve it by hand, then carries on.
 
 ## Refining results across multiple searches
 
@@ -137,13 +150,13 @@ After running job-scraper with two or more different keyword searches, you can u
 python refine-results.py
 ```
 
-Run it from the same folder as your results files. It will auto-detect all `results-*.html` files and ask you to confirm before proceeding. You can also pass specific files as arguments:
+Run it from the same folder as your results files. It will auto-detect `results/<keyword>/latest.html` for every keyword and ask you to confirm before proceeding. You can also pass specific files as arguments:
 
 ```bash
-python refine-results.py results-all-systems-analyst.html results-all-systems-engineer.html
+python refine-results.py results/systems-analyst/latest.html results/systems-engineer/latest.html
 ```
 
-It produces a single `results-aggregated.html` report with jobs ranked by how many of your searches they appeared in. Jobs appearing in all searches are surfaced at the top. It also automatically separates out:
+It produces a report in `results/_aggregated/` with jobs ranked by how many of your searches they appeared in. Jobs appearing in all searches are surfaced at the top. It also automatically separates out:
 
 - **Likely irrelevant** — titles whose words appear rarely across the result set, flagging outliers that slipped through keyword matching
 - **High volume recruiters** — companies posting 6 or more listings, separated for review as they may be aggregators rather than direct hirers
