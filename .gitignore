@@ -173,3 +173,13 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# job-scraper output and personal data (cookies are session credentials!)
+data/
+results/
+debug/
+*cookies*.json
+seen-*.json
+results-*.html
+job-scraper-config.json
+indeed-browser-context.json
