@@ -9,8 +9,10 @@ Jobs appearing in more searches are ranked higher.
 All original data (Easy Apply, links, company, site) is preserved.
 
 Usage:
-    python refine-results.py
-    python refine-results.py results-reed-soc-analyst.html results-reed-cyber-security-analyst.html
+    python refine-results.py            # uses results/<keyword>/latest.html for every keyword
+    python refine-results.py results/soc-analyst/latest.html results/cyber-security-analyst/latest.html
+
+Output: results/_aggregated/<YYYY-MM-DD_HHMM>.html (+ results/_aggregated/latest.html)
 """
 
 import sys
@@ -19,6 +21,10 @@ import re
 import glob
 from datetime import datetime
 from collections import defaultdict
+
+# Same folder layout as job-scraper.ts — always relative to this script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+RESULTS_DIR = os.path.join(SCRIPT_DIR, 'results')
 
 
 # ─────────────────────────────────────────────
@@ -45,6 +51,9 @@ def parse_results_file(filepath):
         # e.g. results-all-cyber-security-analyst.html → cyber security analyst
         #      results-reed-soc-analyst.html → soc analyst
         basename = os.path.basename(filepath)
+        if basename == 'latest.html' or re.match(r'^\d{4}-\d{2}-\d{2}_\d{4}_', basename):
+            # New layout: the keyword is the folder name
+            basename = os.path.basename(os.path.dirname(os.path.abspath(filepath))) + '.html'
         basename = re.sub(r'^results-(?:all|reed|indeed|totaljobs)-', '', basename)
         basename = re.sub(r'\.html$', '', basename)
         keyword = basename.replace('-', ' ')
@@ -455,20 +464,25 @@ def main():
             print(f'  ⚠  File(s) not found: {", ".join(missing)}')
             sys.exit(1)
     else:
-        # Auto-detect results HTML files (exclude aggregated)
-        files = sorted([
-            f for f in glob.glob('results-*.html')
+        # Auto-detect: the latest report for every keyword under results/,
+        # plus any old-style results-*.html files still lying around.
+        files = sorted(
+            glob.glob(os.path.join(RESULTS_DIR, '*', 'latest.html'))
+        )
+        files = [f for f in files if os.path.basename(os.path.dirname(f)) != '_aggregated']
+        files += sorted(
+            f for f in glob.glob(os.path.join(SCRIPT_DIR, 'results-*.html'))
             if 'aggregated' not in f
-        ])
+        )
 
         if not files:
-            print('  No results-*.html files found in the current directory.')
-            print('  Run from the same folder as your results files, or pass file paths as arguments.')
+            print('  No reports found in results/<keyword>/latest.html.')
+            print('  Run job-scraper first, or pass file paths as arguments.')
             sys.exit(1)
 
         print(f'  Found {len(files)} results file(s):')
         for f in files:
-            print(f'    - {f}')
+            print(f'    - {os.path.relpath(f, SCRIPT_DIR)}')
 
         answer = input('\n  Load these files? (y/n): ').strip().lower()
         if answer != 'y':
@@ -525,11 +539,14 @@ def main():
 
     # Generate report
     html = generate_report(aggregated, keywords, source_files, high_volume_groups)
-    outfile = 'results-aggregated.html'
-    with open(outfile, 'w', encoding='utf-8') as f:
-        f.write(html)
+    out_dir = os.path.join(RESULTS_DIR, '_aggregated')
+    os.makedirs(out_dir, exist_ok=True)
+    outfile = os.path.join(out_dir, datetime.now().strftime('%Y-%m-%d_%H%M') + '.html')
+    for path in (outfile, os.path.join(out_dir, 'latest.html')):
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(html)
 
-    print(f'\n  ✓  Report saved to {outfile}\n')
+    print(f'\n  ✓  Report saved to {os.path.relpath(outfile, SCRIPT_DIR)} (and _aggregated/latest.html)\n')
 
 
 if __name__ == '__main__':
